@@ -11,7 +11,7 @@ SUSPEND_ON_CRITICAL=false
 CRITICAL_SOUND='/usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga'
 
 play_critical_sound() {
-  bash $HOME/piper/scripts/speak.sh "Battery is in critical condition. Please connect to charger. I repeat, battery in critical condition." >/dev/null 2>&1 &
+  bash $HOME/bashScripts/speak.sh "Battery is in critical condition. Please connect to charger. I repeat, battery in critical condition." >/dev/null 2>&1 &
   paplay "$CRITICAL_SOUND" >/dev/null 2>&1
 }
 
