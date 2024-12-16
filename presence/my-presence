@@ -1,0 +1,102 @@
+
+
+import os
+import requests
+import psutil
+import time
+import socket
+
+# URL to post activity data
+url = ""
+
+# List of activities to monitor
+activities = [
+    "zed-editor", "teams", "zoom", "chrome", "discord",
+    "firefox", "MongoDB Compass", "postman", "telegram-desktop",
+    "inkscape", "figma"
+]
+
+# Send a desktop notification to indicate the script has started (visible for 1 second)
+os.system('notify-send -t 1000 "Activity Monitor" "Script has started"')
+
+# Function to determine activity title (one word)
+def get_activity_title(name):
+    if name in ["zed-editor"]:
+        return "Coding"
+    elif name in ["teams", "zoom"]:
+        return "Meeting"
+    elif name in ["chrome", "firefox"]:
+        return "Browsing"
+    elif name in ["MongoDB Compass", "postman"]:
+        return "Testing"
+    elif name in ["discord"]:
+        return "Chatting"
+    elif name in ["inkscape", "figma"]:
+        return "Designing"
+    elif name in ["telegram-desktop"]:
+        return "Messaging"
+    else:
+        return "Other"
+
+# Function to format elapsed time
+def format_time(start_time):
+    elapsed_time = time.time() - start_time
+    minutes, seconds = divmod(elapsed_time, 60)
+    return f"{int(minutes):02}:{int(seconds):02}"
+
+# Function to check if there is an active internet connection
+def is_connected():
+    try:
+        # Try to connect to a reliable public DNS server
+        socket.create_connection(("8.8.8.8", 53), timeout=2)
+        return True
+    except OSError:
+        return False
+
+# Initialize variables
+previous_activity = None
+previous_post_time = 0  # Time of last post in seconds
+
+# Continuously monitor processes
+while True:
+    for proc in psutil.process_iter(['name', 'status', 'create_time']):
+        try:
+            name, status, start_time = proc.info['name'], proc.info['status'], proc.info['create_time']
+            if status != "running" or name not in activities:
+                continue
+            print(f"activity:{name},status:{status}")
+            formatted_time = format_time(start_time)
+            current_activity_title = get_activity_title(name)
+
+            current_time = time.time()
+            # Check if activity has changed or 5 minutes have passed since last post
+            if name != previous_activity or (current_time - previous_post_time) > 300:  # 300 seconds = 5 minutes
+                if name in activities:
+                    if is_connected():  # Only attempt to post if there's internet
+                        try:
+                            data={
+                                    "activity": name,  # Send the process name
+                                    "title": current_activity_title,  # Send the one-word title
+                                    "started_time": formatted_time
+                                }
+                            print(data)
+                            response = requests.post(
+                                url,
+                                json=data
+                            )
+                            if response.status_code == 200:
+                                previous_post_time = current_time
+                                previous_activity = name
+                                continue
+                        except requests.exceptions.RequestException:
+                            continue
+                else:
+                    continue
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            continue
+        except Exception:
+            continue
+
+    # Wait for 1 second before checking again
+    time.sleep(1)
+
