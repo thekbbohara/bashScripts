@@ -7,8 +7,8 @@ if [ -z "$1" ]; then
 fi
 
 # Define the model and Piper binary paths
-PIPER_BIN="$HOME/piper/piper"
-MODEL_PATH="$HOME/piper/voices/en_GB/semaine-medium.onnx"
+PIPER_BIN="$HOME/piper/build/piper"
+MODEL_PATH="$HOME/piper/voices/en_GB/semaine/semaine-medium.onnx"
 
 # Synthesize speech and play the output
 echo "$1" | "$PIPER_BIN" --model "$MODEL_PATH" --output-raw |
