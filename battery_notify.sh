@@ -36,8 +36,8 @@ random_message() {
 play_critical_sound() {
   local msg=$(random_message "${CRITICAL_MSGS[@]}")
   notify-send -u critical -i battery-missing "⚠️ Battery Critical" "$msg"
+  paplay "$CRITICAL_SOUND" >/dev/null 2>&1 &
   sh $HOME/bashScripts/speak.sh "$msg" &
-  paplay "$CRITICAL_SOUND" >/dev/null 2>&1
 }
 
 # Play sarcastic battery full notification
