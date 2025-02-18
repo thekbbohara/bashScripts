@@ -7,7 +7,7 @@ THRESHOLD=30
 LOW=20
 CRITICAL=10
 SUSPEND_ON_CRITICAL=false
-CRITICAL_SOUND='/usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga'
+# CRITICAL_SOUND='/usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga'
 
 # Arrays for sarcastic messages
 CRITICAL_MSGS=(
@@ -36,7 +36,7 @@ random_message() {
 play_critical_sound() {
   local msg=$(random_message "${CRITICAL_MSGS[@]}")
   notify-send -u critical -i battery-missing "⚠️ Battery Critical" "$msg"
-  paplay "$CRITICAL_SOUND" >/dev/null 2>&1 &
+  # paplay "$CRITICAL_SOUND" >/dev/null 2>&1 &
   sh $HOME/bashScripts/speak.sh "$msg" &
 }
 
